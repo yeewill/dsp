@@ -69,16 +69,102 @@ Cohen's D is an example of effect size.  Other examples of effect size are:  cor
 
 You will see effect size again and again in results of algorithms that are run in data science.  For instance, in the bootcamp, when you run a regression analysis, you will recognize the t-statistic as an example of effect size.
 
+
+``` {python}
+from __future__ import print_function, division
+
+%matplotlib inline
+
+import numpy as np
+
+import nsfg
+import first
+
+def CohenEffectSize(group1, group2):
+    """Computes Cohen's effect size for two groups.
+    
+    group1: Series or DataFrame
+    group2: Series or DataFrame
+    
+    returns: float if the arguments are Series;
+             Series if the arguments are DataFrames
+    """
+    diff = group1.mean() - group2.mean()
+
+    var1 = group1.var()
+    var2 = group2.var()
+    n1, n2 = len(group1), len(group2)
+
+    pooled_var = (n1 * var1 + n2 * var2) / (n1 + n2)
+    d = diff / np.sqrt(pooled_var)
+    return d
+    
+ CohenEffectSize(firsts.prglngth, others.prglngth)
+
+```
+
+
 ### Q2. [Think Stats Chapter 3 Exercise 1](statistics/3-1-actual_biased.md) (actual vs. biased)
 This problem presents a robust example of actual vs biased data.  As a data scientist, it will be important to examine not only the data that is available, but also the data that may be missing but highly relevant.  You will see how the absence of this relevant data will bias a dataset, its distribution, and ultimately, its statistical interpretation.
+
+```{python}
+resp = nsfg.ReadFemResp()
+pmf = thinkstats2.Pmf(resp.numkdhh)
+biasedpmf = BiasPmf(pmf, label ='observed')
+thinkplot.PrePlot(2)
+thinkplot.Hist(pmf, align = 'right', width = width, label = 'real')
+thinkplot.Hist(biasedpmf, align = 'left', width = width)
+thinkplot.Config(xlabel = 'numer of children', ylabel ='probability')
+
+def PmfMean(pmf):
+    mean = 0
+    for x,p in pmf.Items():
+        mean += x*p
+    return mean
+
+PmfMean(pmf)    
+
+def PmfVar(pmf):
+    mean = 0
+    for x,p in pmf.Items():
+        mean += x*p
+    var = 0
+    for x,p in pmf.Items():
+        var += p * (x - mean)**2
+    return(var)
+PmfVar(pmf)
+
+print(pmf.Mean(),pmf.Var())
+PmfMean(biasedpmf)
+```
 
 ### Q3. [Think Stats Chapter 4 Exercise 2](statistics/4-2-random_dist.md) (random distribution)  
 This questions asks you to examine the function that produces random numbers.  Is it really random?  A good way to test that is to examine the pmf and cdf of the list of random numbers and visualize the distribution.  If you're not sure what pmf is, read more about it in Chapter 3.  
 
+
+
+```{python}
+thousand_random=np.random.random(1000)
+
+cdf = thinkstats2.Cdf(thousand_random, label= '1000 Random Numbers')
+thinkplot.Cdf(cdf)
+thinkplot.Config(xlabel = 'value', ylabel = 'CDF')
+
+pmf = thinkstats2.Pmf(thousand_random, label ='1000 Random Numbers')
+thinkplot.Pmf(pmf)
+thinkplot.Config(xlabel = 'value', ylable = 'PMF')
+```
 ### Q4. [Think Stats Chapter 5 Exercise 1](statistics/5-1-blue_men.md) (normal distribution of blue men)
 This is a classic example of hypothesis testing using the normal distribution.  The effect size used here is the Z-statistic. 
 
+```{python}
+mu = 178
+sigma = 7.7
+dist = scipy.stats.norm(loc=mu, scale=sigma)
+type(dist)
 
+dist.cdf(185.42)- dist.cdf(177.8)
+```
 
 ### Q5. Bayesian (Elvis Presley twin) 
 
@@ -86,14 +172,20 @@ Bayes' Theorem is an important tool in understanding what we really know, given 
 
 Elvis Presley had a twin brother who died at birth.  What is the probability that Elvis was an identical twin? Assume we observe the following probabilities in the population: fraternal twin is 1/125 and identical twin is 1/300.  
 
->> REPLACE THIS TEXT WITH YOUR RESPONSE
+>> P Twin = P I. Twin + P F. Twin (Indenpendent and descrete events)
+>> I. Twin = A
+>> Twin = B
+>> P(A|B) read as probability of A given B is what we are looking for Probability Elvis had an identical twin given he was a twin.
+>>  P(B|A) =100: since A is a subset of B
+>> P(A|B) =P(B|A) * P(A) / P(B)
+>> p(A|B) = 5/17
 
 ---
 
 ### Q6. Bayesian &amp; Frequentist Comparison  
 How do frequentist and Bayesian statistics compare?
 
->> REPLACE THIS TEXT WITH YOUR RESPONSE
+>> Bayesian stats use prior knowledge of the situation to influence the model, while the frequentist uses a pure inputs to the model to product an output
 
 ---
 
